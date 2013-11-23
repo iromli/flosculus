@@ -1,7 +1,7 @@
-"""Logwatcher
+"""Flosculus
 
 Usage:
-    logwatcher -c <config>
+    flosculus -c <config>
 
 Options:
     -h --help       Show this screen.
@@ -15,7 +15,7 @@ from docopt import docopt
 
 
 def main():
-    arguments = docopt(__doc__, version="Logwatcher v0.1")
+    arguments = docopt(__doc__, version="Flosculus v0.1")
 
     config = configs.load(arguments["<config>"])
 
