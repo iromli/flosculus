@@ -1,4 +1,3 @@
-import re
 import time
 
 from fluent import sender as fluent_sender
@@ -12,12 +11,12 @@ class Sender(object):
         tag_parts = tag.split(".")
 
         fluent_sender.setup(tag_parts[0], **kwargs)
-        self._label = ".".join(tag_parts[1:])
 
+        self._label = ".".join(tag_parts[1:])
         self._parser = Parser(kwargs.get("format"))
         self._time_format = "%d/%b/%Y:%H:%M:%S"
 
-    def on_log_parsed(self, filename, lines):
+    def on_recv(self, filename, lines):
         # TODO: use generator
         for line in lines:
             parsed_line = self._parser.parse(line)

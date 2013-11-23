@@ -10,7 +10,6 @@ import os
 import time
 import errno
 import stat
-import sys
 
 import logbook
 
@@ -59,8 +58,10 @@ class LogWatcher(object):
         self._files_map = {}
         self._callback = callback
         self._sizehint = sizehint
+
         assert os.path.isdir(self.folder), self.folder
         assert callable(callback), repr(callback)
+
         self.update_files()
         for id, file in self._files_map.items():
             file.seek(os.path.getsize(file.name))  # EOF
@@ -110,8 +111,10 @@ class LogWatcher(object):
         """
         ls = os.listdir(self.folder)
         if self.extensions:
-            return [x for x in ls if os.path.splitext(x)[1][1:] \
-                                           in self.extensions]
+            return [
+                x for x in ls if os.path.splitext(x)[1][1:]
+                in self.extensions
+            ]
         else:
             return ls
 
@@ -135,18 +138,23 @@ class LogWatcher(object):
         """Read last N lines from file fname."""
         if window <= 0:
             raise ValueError('invalid window value %r' % window)
+
         with cls.open(fname) as f:
             BUFSIZ = 1024
+
             # True if open() was overridden and file was opened in text
             # mode. In that case readlines() will return unicode strings
             # instead of bytes.
             encoded = getattr(f, 'encoding', False)
             CR = '\n' if encoded else b'\n'
             data = '' if encoded else b''
+
             f.seek(0, os.SEEK_END)
             fsize = f.tell()
+
             block = -1
             exit = False
+
             while not exit:
                 step = (block * BUFSIZ)
                 if abs(step) >= fsize:
@@ -156,6 +164,7 @@ class LogWatcher(object):
                 else:
                     f.seek(step, os.SEEK_END)
                     newdata = f.read(BUFSIZ)
+
                 data = newdata + data
                 if data.count(CR) >= window:
                     break
@@ -167,6 +176,7 @@ class LogWatcher(object):
         ls = []
         for name in self.listdir():
             absname = os.path.realpath(os.path.join(self.folder, name))
+
             try:
                 st = os.stat(absname)
             except EnvironmentError as err:
@@ -183,10 +193,9 @@ class LogWatcher(object):
             try:
                 st = os.stat(file.name)
             except EnvironmentError as err:
-                if err.errno == errno.ENOENT:
-                    self.unwatch(file, fid)
-                else:
+                if err.errno != errno.ENOENT:
                     raise
+                self.unwatch(file, fid)
             else:
                 if fid != self.get_file_id(st):
                     # same name but different file (rotation); reload it.
@@ -225,6 +234,7 @@ class LogWatcher(object):
         # file.
         self.log("un-watching logfile %s" % file.name)
         del self._files_map[fid]
+
         with file:
             lines = self.readlines(file)
             if lines:

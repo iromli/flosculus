@@ -1,4 +1,3 @@
-import logging
 import re
 import logbook
 
@@ -17,11 +16,7 @@ DEFAULT_FORMAT_CHOICES = {
 
 class Parser(object):
     def __init__(self, format_):
-        if format_ in DEFAULT_FORMAT_CHOICES:
-            self._format = DEFAULT_FORMAT_CHOICES.get(format_)
-        else:
-            self._format = format_
-
+        self._format = DEFAULT_FORMAT_CHOICES.get(format_) or format_
         self._keys = re.findall("\?P<(.*?)>", self._format)
         self._line_re = re.compile(self._format)
 
@@ -29,6 +24,6 @@ class Parser(object):
         pattern = self._line_re.search(line)
         try:
             return dict(zip(self._keys, pattern.groups()))
-        except AttributeError as exc:
+        except AttributeError:
             logger.warn("line doesn't match the format '%s'" % self._format)
             return
