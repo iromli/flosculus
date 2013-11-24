@@ -23,32 +23,27 @@ class LogWatcher(object):
 
     Example:
 
-    >>> def callback(filename, lines):
-    ...     print(filename, lines)
-    ...
-    >>> lw = LogWatcher("/var/log/", callback)
-    >>> lw.loop()
+    .. sourcecode:: python
+
+        def callback(filename, lines):
+            print(filename, lines)
+
+        lw = LogWatcher("/var/log/", callback)
+        lw.loop()
     """
 
     def __init__(self, folder, callback, extensions=["log"],
                  tail_lines=0, sizehint=1048576):
         """Arguments:
 
-        (str) @folder:
-            the folder to watch
-
-        (callable) @callback:
-            a function which is called every time one of the file being
-            watched is updated;
-            this is called with "filename" and "lines" arguments.
-
-        (list) @extensions:
-            only watch files with these extensions
-
-        (int) @tail_lines:
-            read last N lines from files being watched before starting
-
-        (int) @sizehint: passed to file.readlines(), represents an
+        :param folder: the folder to watch
+        :param callback: a function which is called every time one of
+            the file being watched is updated; this is called with
+            "filename" and "lines" arguments.
+        :param extensions: only watch files with these extensions
+        :param tail_lines: read last N lines from files being watched
+            before starting
+        :param sizehint: passed to file.readlines(), represents an
             approximation of the maximum number of bytes to read from
             a file on every ieration (as opposed to load the entire
             file in memory until EOF is reached). Defaults to 1MB.
@@ -127,9 +122,17 @@ class LogWatcher(object):
         Can be overridden in order to deal with unicode strings
         instead, like this:
 
-          import codecs, locale
-          return codecs.open(file, 'r', encoding=locale.getpreferredencoding(),
-                             errors='ignore')
+        .. sourcecode:: python
+
+            import codecs
+            import locale
+
+            return codecs.open(
+                file,
+                'r',
+                encoding=locale.getpreferredencoding(),
+                errors='ignore',
+            )
         """
         return open(file, 'rb')
 
