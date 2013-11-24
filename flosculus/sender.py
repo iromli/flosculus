@@ -17,8 +17,7 @@ class Sender(object):
         self._time_format = "%d/%b/%Y:%H:%M:%S"
 
     def on_recv(self, filename, lines):
-        # TODO: use generator
-        for line in lines:
+        for line in iter(lines):
             parsed_line = self._parser.parse(line)
 
             if not parsed_line:
