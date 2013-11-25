@@ -11,8 +11,8 @@ from .watcher import LogWatcher
 class Flosculus(object):
     def __init__(self, config):
         logs = {
-            key:val for key, val in config.iteritems()
-            if key not in ("DEFAULT", "flosculus")
+            val["path"]:val for key, val in config.iteritems()
+            if key not in ("DEFAULT", "flosculus",)
         }
         files = [path for path in logs]
 
@@ -20,11 +20,18 @@ class Flosculus(object):
         self._time_format = "%d/%b/%Y:%H:%M:%S"
         self._routes = {}
 
+        url_parts = config["flosculus"]["fluent_url"].split(":")
+        try:
+            host, port = url_parts[0], url_parts[1]
+        except IndexError:
+            host, port = url_parts[0], 24224
+
         for path, section in logs.iteritems():
             tag_parts = section["tag"].split(".")
             self._routes[path] = {
                 "parser": Parser(section["format"]),
-                "sender": FluentSender(tag_parts[0]),
+                "sender": FluentSender(
+                    tag_parts[0], host=host, port=port),
                 "label": ".".join(tag_parts[1:]),
             }
 
