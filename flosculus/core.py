@@ -22,7 +22,7 @@ class Flosculus(object):
 
         url_parts = config["flosculus"]["fluent_url"].split(":")
         try:
-            host, port = url_parts[0], url_parts[1]
+            host, port = url_parts[0], int(url_parts[1])
         except IndexError:
             host, port = url_parts[0], 24224
 
