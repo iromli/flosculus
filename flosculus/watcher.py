@@ -32,15 +32,13 @@ class LogWatcher(object):
         lw.loop()
     """
 
-    def __init__(self, folder, callback, extensions=["log"],
-                 tail_lines=0, sizehint=1048576):
+    def __init__(self, files, callback, tail_lines=0, sizehint=1048576):
         """Arguments:
 
-        :param folder: the folder to watch
+        :param files: the files to watch
         :param callback: a function which is called every time one of
             the file being watched is updated; this is called with
             "filename" and "lines" arguments.
-        :param extensions: only watch files with these extensions
         :param tail_lines: read last N lines from files being watched
             before starting
         :param sizehint: passed to file.readlines(), represents an
@@ -48,14 +46,10 @@ class LogWatcher(object):
             a file on every ieration (as opposed to load the entire
             file in memory until EOF is reached). Defaults to 1MB.
         """
-        self.folder = os.path.realpath(folder)
-        self.extensions = extensions
+        self._files = files
         self._files_map = {}
         self._callback = callback
         self._sizehint = sizehint
-
-        assert os.path.isdir(self.folder), self.folder
-        assert callable(callback), repr(callback)
 
         self.update_files()
         for id, file in self._files_map.items():
@@ -98,20 +92,6 @@ class LogWatcher(object):
     def log(self, line):
         """Log when a file is un/watched"""
         logger.info(line)
-
-    def listdir(self):
-        """List directory and filter files by extension.
-        You may want to override this to add extra logic or globbing
-        support.
-        """
-        ls = os.listdir(self.folder)
-        if self.extensions:
-            return [
-                x for x in ls if os.path.splitext(x)[1][1:]
-                in self.extensions
-            ]
-        else:
-            return ls
 
     @classmethod
     def open(cls, file):
@@ -177,11 +157,9 @@ class LogWatcher(object):
 
     def update_files(self):
         ls = []
-        for name in self.listdir():
-            absname = os.path.realpath(os.path.join(self.folder, name))
-
+        for name in self._files:
             try:
-                st = os.stat(absname)
+                st = os.stat(name)
             except EnvironmentError as err:
                 if err.errno != errno.ENOENT:
                     raise
@@ -189,7 +167,7 @@ class LogWatcher(object):
                 if not stat.S_ISREG(st.st_mode):
                     continue
                 fid = self.get_file_id(st)
-                ls.append((fid, absname))
+                ls.append((fid, name))
 
         # check existent files
         for fid, file in list(self._files_map.items()):
@@ -201,7 +179,8 @@ class LogWatcher(object):
                 self.unwatch(file, fid)
             else:
                 if fid != self.get_file_id(st):
-                    # same name but different file (rotation); reload it.
+                    # same name but different file (rotation);
+                    # reload it.
                     self.unwatch(file, fid)
                     self.watch(file.name)
 

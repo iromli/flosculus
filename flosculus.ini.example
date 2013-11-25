@@ -1,4 +1,8 @@
-[input]
+[flosculus]
+; the IP address (or host name) and TCP port of the server
+fluent_url = 127.0.0.1:24224
+
+[/var/log/nginx/access.log]
 
 ; the label
 tag = example.api.access
@@ -7,17 +11,10 @@ tag = example.api.access
 format = nginx
 ; format = (?P<remote>[^ ]*) (?P<host>[^ ]*) (?P<user>[^ ]*) \[(?P<time>[^\]]*)\] "(?P<method>\S+)(?: +(?P<path>[^\"]*) +\S*)?" (?P<code>[^ ]*) (?P<size>[^ ]*)(?: "(?P<referer>[^\"]*)" "(?P<agent>[^\"]*)")(?: (?P<request_time>[^ ]*) (?P<upstream_time>[^ ]*) (?P<pipe>[\.|p]))?
 
-; the paths to read, currently only support directory
-path = /var/log/nginx
+[/var/log/nginx/stream.access.log]
 
-[output]
+; the label
+tag = stream.api.access
 
-; the IP address or host name of the server
-host = 127.0.0.1
-
-; the TCP port of the server
-port = 24224
-
-; the timeout time when sending event logs
-; (not implemented)
-send_timeout = 60
+; format to use, either use 'nginx' or custom regex
+format = (?P<remote>[^ ]*) (?P<host>[^ ]*) (?P<user>[^ ]*) \[(?P<time>[^\]]*)\] "(?P<method>\S+)(?: +(?P<path>[^\"]*) +\S*)?" (?P<code>[^ ]*) (?P<size>[^ ]*)(?: "(?P<referer>[^\"]*)" "(?P<agent>[^\"]*)")(?: (?P<request_time>[^ ]*) (?P<upstream_time>[^ ]*) (?P<pipe>[\.|p]))?

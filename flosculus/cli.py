@@ -7,21 +7,17 @@ Options:
     -h --help       Show this screen.
     -v --version    Show version.
 """
-from .watcher import LogWatcher
-from .sender import Sender
+from .core import Flosculus
 
-import configs
+import configparser
 from docopt import docopt
 
 
 def main():
     arguments = docopt(__doc__, version="v0.1")
-    config = configs.load(arguments["<config>"])
 
-    sender = Sender(
-        config["input"]["tag"],
-        **dict(format=config["input"]["format"])
-    )
+    config = configparser.ConfigParser()
+    config.read(arguments["<config>"])
 
-    watcher = LogWatcher(config["input"]["path"], sender.on_recv)
-    watcher.loop()
+    flosculus = Flosculus(config)
+    flosculus.run()
