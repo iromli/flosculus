@@ -8,10 +8,14 @@ from .parser import Parser
 from .watcher import LogWatcher
 
 
+class ConfigError(Exception):
+    pass
+
+
 class Flosculus(object):
     def __init__(self, config):
         logs = {
-            val["path"]:val for key, val in config.iteritems()
+            val["path"]: val for key, val in config.iteritems()
             if key not in ("DEFAULT", "flosculus",)
         }
         files = [path for path in logs]
@@ -25,6 +29,9 @@ class Flosculus(object):
             host, port = url_parts[0], int(url_parts[1])
         except IndexError:
             host, port = url_parts[0], 24224
+        except ValueError:
+            raise ConfigError(
+                "port must be an integer: {!r}".format(url_parts[1]))
 
         for path, section in logs.iteritems():
             tag_parts = section["tag"].split(".")
