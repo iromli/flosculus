@@ -120,7 +120,7 @@ class LogWatcher(object):
     def tail(cls, fname, window):
         """Read last N lines from file fname."""
         if window <= 0:
-            raise ValueError('invalid window value %r' % window)
+            raise ValueError('invalid window value {!r}'.format(window))
 
         with cls.open(fname) as f:
             BUFSIZ = 1024
@@ -207,14 +207,14 @@ class LogWatcher(object):
             if err.errno != errno.ENOENT:
                 raise
         else:
-            self.log("watching logfile %s" % fname)
+            self.log("watching logfile {}".format(fname))
             self._files_map[fid] = file
 
     def unwatch(self, file, fid):
         # File no longer exists. If it has been renamed try to read it
         # for the last time in case we're dealing with a rotating log
         # file.
-        self.log("un-watching logfile %s" % file.name)
+        self.log("un-watching logfile {}".format(file.name))
         del self._files_map[fid]
 
         with file:
@@ -225,9 +225,9 @@ class LogWatcher(object):
     @staticmethod
     def get_file_id(st):
         if os.name == 'posix':
-            return "%xg%x" % (st.st_dev, st.st_ino)
+            return "{:x}g{:x}".format(st.st_dev, st.st_ino)
         else:
-            return "%f" % st.st_ctime
+            return "{:f}".format(st.st_ctime)
 
     def close(self):
         for id, file in self._files_map.items():

@@ -25,5 +25,6 @@ class Parser(object):
         try:
             return dict(zip(self._keys, pattern.groups()))
         except AttributeError:
-            logger.warn("line doesn't match the format '%s'" % self._format)
+            logger.warn(
+                "line doesn't match the format {!r}".format(self._format))
             return
