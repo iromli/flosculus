@@ -26,4 +26,10 @@ setup(
         "console_scripts": ["flosculusd=flosculus.cli:main"],
     },
     zip_safe=False,
+    install_requires=[
+        "logbook>=0.6.0",
+        "configparser>=3.3.0r2",
+        "docopt>=0.6.1",
+        "fluent-logger>=0.3.3",
+    ],
 )
