@@ -1,4 +1,0 @@
-#!/usr/bin/env python
-from flosculus.cli import main
-
-main()
