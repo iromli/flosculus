@@ -1,6 +1,7 @@
 import time
 from functools import partial
 
+import configparser
 from fluent.sender import FluentSender
 from fluent import event
 
@@ -12,33 +13,53 @@ class ConfigError(Exception):
     pass
 
 
+def config_from_inifile(inifile):
+    config = configparser.ConfigParser()
+    config.read(inifile)
+
+    settings = {}
+    try:
+        settings["flosculus"] = dict(config["flosculus"])
+    except KeyError:
+        raise ConfigError(
+            "config doesn't have {!r} section".format("flosculus")
+        )
+
+    try:
+        remote_port = int(settings["flosculus"]["remote_port"])
+    except ValueError:
+        raise ConfigError(
+            "remote_port must be an int: {!r}".format(
+                settings["flosculus"]["remote_port"])
+        )
+    else:
+        settings["flosculus"]["remote_port"] = remote_port
+
+    settings["logs"] = {}
+    for section, values in config.iteritems():
+        if not section.startswith("log:"):
+            continue
+        path = section.rsplit(":")[1:][0]
+        settings["logs"][path] = dict(values)
+    return settings
+
+
 class Flosculus(object):
     def __init__(self, config):
-        logs = {
-            val["path"]: val for key, val in config.iteritems()
-            if key not in ("DEFAULT", "flosculus",)
-        }
-        files = [path for path in logs]
-
-        self._watcher = partial(LogWatcher, files)
+        self._config = config_from_inifile(config)
+        self._watcher = partial(LogWatcher, self._config["logs"].keys())
         self._time_format = "%d/%b/%Y:%H:%M:%S"
         self._routes = {}
 
-        url_parts = config["flosculus"]["fluent_url"].split(":")
-        try:
-            host, port = url_parts[0], int(url_parts[1])
-        except IndexError:
-            host, port = url_parts[0], 24224
-        except ValueError:
-            raise ConfigError(
-                "port must be an integer: {!r}".format(url_parts[1]))
-
-        for path, section in logs.iteritems():
-            tag_parts = section["tag"].split(".")
+        for path, values in self._config["logs"].iteritems():
+            tag_parts = values["tag"].split(".")
             self._routes[path] = {
-                "parser": Parser(section["format"]),
+                "parser": Parser(values["format"]),
                 "sender": FluentSender(
-                    tag_parts[0], host=host, port=port),
+                    tag_parts[0],
+                    host=self._config["flosculus"]["remote_host"],
+                    port=self._config["flosculus"]["remote_port"],
+                ),
                 "label": ".".join(tag_parts[1:]),
             }
 

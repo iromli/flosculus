@@ -1,27 +1,16 @@
 [flosculus]
-; the IP address (or host name) and TCP port of the server
-fluent_url = 127.0.0.1:24224
+; the IP address (or host name) of the remote server
+remote_host = 127.0.0.1
+
+; the TCP port of the remote server
+remote_port = 24224
 
 
-[nginx_access]
-
-; path to log file
-path = /var/log/nginx/access.log
+; Each section with `path:/path/to/log` is a valid config
+[log:/var/log/nginx/access.log]
 
 ; the label
 tag = example.api.access
 
 ; format to use, either use 'nginx' or custom regex
 format = (?P<remote>[^ ]*) (?P<host>[^ ]*) (?P<user>[^ ]*) \[(?P<time>[^\]]*)\] "(?P<method>\S+)(?: +(?P<path>[^\"]*) +\S*)?" (?P<code>[^ ]*) (?P<size>[^ ]*)(?: "(?P<referer>[^\"]*)" "(?P<agent>[^\"]*)")(?: (?P<request_time>[^ ]*) (?P<upstream_time>[^ ]*) (?P<pipe>[\.|p]))?
-
-
-[nginx_stream_access]
-
-; path to log file
-path = /var/log/nginx/stream.access.log
-
-; the label
-tag = stream.api.access
-
-; format to use, either use 'nginx' or custom regex
-format = nginx
