@@ -1,3 +1,4 @@
+DEFAULT_CONFIG = """
 [flosculus]
 ; the IP address (or host name) of the remote server
 remote_host = 127.0.0.1
@@ -13,4 +14,5 @@ remote_port = 24224
 tag = example.api.access
 
 ; format to use, either use 'nginx' or custom regex
-format = (?P<remote>[^ ]*) (?P<host>[^ ]*) (?P<user>[^ ]*) \[(?P<time>[^\]]*)\] "(?P<method>\S+)(?: +(?P<path>[^\"]*) +\S*)?" (?P<code>[^ ]*) (?P<size>[^ ]*)(?: "(?P<referer>[^\"]*)" "(?P<agent>[^\"]*)")(?: (?P<request_time>[^ ]*) (?P<upstream_time>[^ ]*) (?P<pipe>[\.|p]))?
+format = nginx
+"""

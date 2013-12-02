@@ -10,30 +10,44 @@ from .watcher import LogWatcher
 
 
 class ConfigError(Exception):
+    """An exception class that should be raised when there's
+    no exception classes from :module:`configparser` fit
+    the context.
+    """
     pass
 
 
 def config_from_inifile(inifile):
-    config = configparser.ConfigParser()
+    """Parses the given any file with `ini` syntax-wise to construct
+    necessary configuration values.
+    """
+    config = configparser.SafeConfigParser()
     config.read(inifile)
 
     settings = {}
     try:
         settings["flosculus"] = dict(config["flosculus"])
     except KeyError:
-        raise ConfigError(
-            "config doesn't have {!r} section".format("flosculus")
+        raise configparser.NoSectionError(
+            "config file {!r} does not have {!r} section".format(
+                inifile, "flosculus")
         )
 
+    # set defaults
+    settings["flosculus"]["remote_host"] = \
+        settings["flosculus"].get("remote_host", "localhost")
+
+    settings["flosculus"]["remote_port"] = \
+        settings["flosculus"].get("remote_port", 24224)
+
     try:
-        remote_port = int(settings["flosculus"]["remote_port"])
+        settings["flosculus"]["remote_port"] = \
+            int(settings["flosculus"]["remote_port"])
     except ValueError:
         raise ConfigError(
-            "remote_port must be an int: {!r}".format(
+            "remote_port must be an int; got {!r} instead".format(
                 settings["flosculus"]["remote_port"])
         )
-    else:
-        settings["flosculus"]["remote_port"] = remote_port
 
     settings["logs"] = {}
     for section, values in config.iteritems():
@@ -64,6 +78,9 @@ class Flosculus(object):
             }
 
     def on_recv(self, filename, lines):
+        """A callback invoked whenever loop event throws a line
+        from a log file.
+        """
         for line in iter(lines):
             route = self._routes.get(filename)
             if not route:
@@ -85,5 +102,7 @@ class Flosculus(object):
             )
 
     def run(self):
+        """Runs the event loop.
+        """
         watcher = self._watcher(self.on_recv)
         watcher.loop()
