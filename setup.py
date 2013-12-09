@@ -5,7 +5,7 @@ from flosculus import _meta
 setup(
     name="flosculus",
     version=_meta.__version__,
-    description="",
+    description="Tail your log, extract the data, and send it to Fluentd",
     long_description="",
     author="Isman Firmansyah",
     author_email="isman.firmansyah@gmail.com",
