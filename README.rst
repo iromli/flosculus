@@ -64,10 +64,18 @@ And did I already mentioned that you can have multiple log files? Simply copy th
     [log:/var/log/nginx/timed-combined.access.log]
 
     ; the label
-    tag = example.api.access
+    tag = test.api.access
 
     ; format to use, either use 'nginx' or custom regex
     format = (?P<remote>[^ ]*) (?P<host>[^ ]*) (?P<user>[^ ]*) \[(?P<time>[^\]]*)\] "(?P<method>\S+)(?: +(?P<path>[^\"]*) +\S*)?" (?P<code>[^ ]*) (?P<size>[^ ]*)(?: "(?P<referer>[^\"]*)" "(?P<agent>[^\"]*)")(?: (?P<request_time>[^ ]*) (?P<upstream_time>[^ ]*) (?P<pipe>[\.|p]))?
+
+    ; the IP address (or host name) of the remote server
+    ; use another Fluentd remote host
+    remote_host = 10.0.0.1
+
+    ; the TCP port of the remote server
+    ; use another Fluentd remote port
+    remote_port = 24225
 
 Assuming the configuration is written properly, run the event loop to see its magic (well, not really):
 

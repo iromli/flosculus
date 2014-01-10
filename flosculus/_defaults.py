@@ -1,11 +1,11 @@
 DEFAULT_CONFIG = """
 [flosculus]
 ; the IP address (or host name) of the remote server
-; this option is deprecated in favor log section remote_host
+; this is a global option but it's easily overriden in log section
 remote_host = 127.0.0.1
 
 ; the TCP port of the remote server
-; this option is deprecated in favor log section remote_port
+; this is a global option but it's easily overriden in log section
 remote_port = 24224
 
 
@@ -19,8 +19,12 @@ tag = example.api.access
 format = nginx
 
 ; the IP address (or host name) of the remote server
-remote_host = 127.0.0.1
+; uncomment this option if you want to use custom remote host
+; for current log
+;remote_host = 127.0.0.1
 
 ; the TCP port of the remote server
-remote_port = 24224
+; uncomment this option if you want to use custom remote port
+; for current log
+;remote_port = 24224
 """
