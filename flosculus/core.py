@@ -17,6 +17,25 @@ class ConfigError(Exception):
     pass
 
 
+def setup_remote_options(section):
+    """Checks remote options if any, otherwise this will set
+    default remote options.
+    """
+    parsed_dict = {
+        "remote_host": section.get("remote_host", "localhost"),
+        "remote_port": section.get("remote_port", 24224)
+    }
+
+    try:
+        parsed_dict["remote_port"] = int(parsed_dict["remote_port"])
+    except ValueError:
+        raise ConfigError(
+            "remote_port must be an int; got {!r} instead".format(
+                parsed_dict["remote_port"])
+        )
+    return parsed_dict
+
+
 def config_from_inifile(inifile):
     """Parses the given any file with `ini` syntax-wise to construct
     necessary configuration values.
@@ -33,28 +52,36 @@ def config_from_inifile(inifile):
                 inifile, "flosculus")
         )
 
-    # set defaults
-    settings["flosculus"]["remote_host"] = \
-        settings["flosculus"].get("remote_host", "localhost")
-
-    settings["flosculus"]["remote_port"] = \
-        settings["flosculus"].get("remote_port", 24224)
-
-    try:
-        settings["flosculus"]["remote_port"] = \
-            int(settings["flosculus"]["remote_port"])
-    except ValueError:
-        raise ConfigError(
-            "remote_port must be an int; got {!r} instead".format(
-                settings["flosculus"]["remote_port"])
-        )
+    # setup global remote options; overridable in log section
+    settings["flosculus"].update(
+        setup_remote_options(settings["flosculus"]))
 
     settings["logs"] = {}
     for section, values in config.iteritems():
         if not section.startswith("log:"):
             continue
+
         path = section.rsplit(":")[1:][0]
         settings["logs"][path] = dict(values)
+
+        # sanity checks for mandatory options
+        if "tag" not in settings["logs"][path]:
+            raise configparser.NoOptionError("tag", path)
+        if "format" not in settings["logs"][path]:
+            raise configparser.NoOptionError("format", path)
+
+        remote_opts = setup_remote_options(settings["logs"][path])
+
+        # fallback to global ``remote_host`` option
+        remote_opts["remote_host"] = remote_opts.get(
+            "remote_host", settings["flosculus"]["remote_host"])
+
+        # fallback to global ``remote_port`` option
+        remote_opts["remote_port"] = remote_opts.get(
+            "remote_port", settings["flosculus"]["remote_port"])
+
+        settings["logs"][path].update(remote_opts)
+
     return settings
 
 
@@ -66,13 +93,13 @@ class Flosculus(object):
         self._routes = {}
 
         for path, values in self._config["logs"].iteritems():
-            tag_parts = values["tag"].split(".")
+            tag_parts = values["tag"].strip(".").split(".")
             self._routes[path] = {
                 "parser": Parser(values["format"]),
                 "sender": FluentSender(
                     tag_parts[0],
-                    host=self._config["flosculus"]["remote_host"],
-                    port=self._config["flosculus"]["remote_port"],
+                    host=values["remote_host"],
+                    port=values["remote_port"],
                 ),
                 "label": ".".join(tag_parts[1:]),
             }

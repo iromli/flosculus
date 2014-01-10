@@ -1,9 +1,11 @@
 DEFAULT_CONFIG = """
 [flosculus]
 ; the IP address (or host name) of the remote server
+; this option is deprecated in favor log section remote_host
 remote_host = 127.0.0.1
 
 ; the TCP port of the remote server
+; this option is deprecated in favor log section remote_port
 remote_port = 24224
 
 
@@ -15,4 +17,10 @@ tag = example.api.access
 
 ; format to use, either use 'nginx' or custom regex
 format = nginx
+
+; the IP address (or host name) of the remote server
+remote_host = 127.0.0.1
+
+; the TCP port of the remote server
+remote_port = 24224
 """
