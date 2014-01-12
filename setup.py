@@ -1,12 +1,15 @@
 from setuptools import setup
 from flosculus import _meta
 
+with open("README.rst") as f:
+    long_desc = f.read()
+
 
 setup(
     name="flosculus",
     version=_meta.__version__,
     description="Tail your log, extract the data, and send it to Fluentd",
-    long_description="",
+    long_description=long_desc,
     author="Isman Firmansyah",
     author_email="isman.firmansyah@gmail.com",
     url="https://github.com/iromli/flosculus",
