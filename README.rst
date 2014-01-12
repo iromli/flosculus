@@ -83,8 +83,6 @@ Assuming the configuration is written properly, run the event loop to see its ma
 
     $ flosculusd -c flosculus.ini
 
-If you have any further question, poke `@iromli <https://twitter.com/iromli>`_ on Twitter.
-
 Credits
 -------
 

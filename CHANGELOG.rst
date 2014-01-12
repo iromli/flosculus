@@ -1,8 +1,8 @@
 CHANGES
 ~~~~~~~
 
-0.2-dev
-=======
+0.2
+===
 
 * Introduce global remote options — overridable in log section.
 
