@@ -1,5 +1,12 @@
-import configparser
+from __future__ import (
+    absolute_import,
+    division,
+    print_function,
+    unicode_literals,
+)
+
 import pytest
+from six.moves import configparser
 
 from flosculus.core import config_from_inifile
 from flosculus.core import ConfigError
@@ -14,7 +21,7 @@ def create_inifile(tmpdir, content):
 
 def test_config_no_main_section(tmpdir):
     inifile = create_inifile(tmpdir, "[flosc]")
-    with pytest.raises(configparser.NoSectionError):
+    with pytest.raises(ConfigError):
         config_from_inifile(str(inifile))
 
 

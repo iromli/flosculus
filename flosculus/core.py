@@ -1,9 +1,17 @@
+from __future__ import (
+    absolute_import,
+    division,
+    print_function,
+    unicode_literals,
+)
+
 import time
 from functools import partial
 
-import configparser
-from fluent.sender import FluentSender
+import six
 from fluent import event
+from fluent.sender import FluentSender
+from six.moves import configparser
 
 from .parser import Parser
 from .watcher import LogWatcher
@@ -45,9 +53,9 @@ def config_from_inifile(inifile):
 
     settings = {}
     try:
-        settings["flosculus"] = dict(config["flosculus"])
-    except KeyError:
-        raise configparser.NoSectionError(
+        settings["flosculus"] = dict(config.items("flosculus"))
+    except configparser.NoSectionError:
+        raise ConfigError(
             "config file {!r} does not have {!r} section".format(
                 inifile, "flosculus")
         )
@@ -57,7 +65,8 @@ def config_from_inifile(inifile):
         setup_remote_options(settings["flosculus"]))
 
     settings["logs"] = {}
-    for section, values in config.iteritems():
+
+    for section, values in six.iteritems(config._sections):
         if not section.startswith("log:"):
             continue
 
@@ -92,7 +101,7 @@ class Flosculus(object):
         self._time_format = "%d/%b/%Y:%H:%M:%S"
         self._routes = {}
 
-        for path, values in self._config["logs"].iteritems():
+        for path, values in six.iteritems(self._config["logs"]):
             tag_parts = values["tag"].strip(".").split(".")
             self._routes[path] = {
                 "parser": Parser(values["format"]),
@@ -118,15 +127,12 @@ class Flosculus(object):
             if not parsed_line:
                 continue
 
-            ts = time.strptime(
-                parsed_line["time"].split()[0], self._time_format)
+            ts = time.strptime(parsed_line["time"].split()[0],
+                               self._time_format)
 
-            event.Event(
-                route["label"],
-                parsed_line,
-                time=int(time.mktime(ts)),
-                sender=route["sender"],
-            )
+            event.Event(route["label"], parsed_line, time=int(time.mktime(ts)),
+                        sender=route["sender"],
+                        )
 
     def run(self):
         """Runs the event loop.

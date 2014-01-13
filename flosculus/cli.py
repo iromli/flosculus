@@ -7,21 +7,25 @@ Options:
     -h --help       Show this screen.
     -v --version    Show version.
 """
-from __future__ import print_function
+from __future__ import (
+    absolute_import,
+    division,
+    print_function,
+    unicode_literals,
+)
 import sys
 
 import logbook
 from docopt import docopt
 
-from .core import Flosculus
-from ._meta import __version__
 from ._defaults import DEFAULT_CONFIG
-
-logger = logbook.Logger(__name__)
+from ._meta import __version__
+from .core import Flosculus
 
 
 def main():
-    arguments = docopt(__doc__, version="v{}".format(__version__))
+    logger = logbook.Logger(__name__)
+    arguments = docopt(__doc__, version=__version__)
 
     if arguments["--init"]:
         print(DEFAULT_CONFIG.strip())

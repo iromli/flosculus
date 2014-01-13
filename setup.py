@@ -1,19 +1,26 @@
 from setuptools import setup
-from flosculus import _meta
+from setuptools import find_packages
 
 with open("README.rst") as f:
     long_desc = f.read()
 
 
+requirements = [
+    "logbook",
+    "docopt",
+    "fluent-logger",
+    "six",
+]
+
+
 setup(
     name="flosculus",
-    version=_meta.__version__,
+    version="0.3.0-dev",
     description="Tail your log, extract the data, and send it to Fluentd",
     long_description=long_desc,
     author="Isman Firmansyah",
-    author_email="isman.firmansyah@gmail.com",
     url="https://github.com/iromli/flosculus",
-    packages=["flosculus"],
+    packages=find_packages(),
     license="MIT",
     classifiers=[
         "Development Status :: 3 - Alpha",
@@ -24,15 +31,13 @@ setup(
         "Programming Language :: Python",
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.4",
     ],
     entry_points={
         "console_scripts": ["flosculusd=flosculus.cli:main"],
     },
     zip_safe=False,
-    install_requires=[
-        "logbook>=0.6.0",
-        "configparser>=3.3.0r2",
-        "docopt>=0.6.1",
-        "fluent-logger>=0.3.3",
-    ],
+    install_requires=requirements,
 )

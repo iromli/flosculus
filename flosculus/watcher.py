@@ -5,6 +5,12 @@ Works with Python >= 2.6 and >= 3.2, on both POSIX and Windows.
 Author: Giampaolo Rodola' <g.rodola [AT] gmail [DOT] com>
 License: MIT
 """
+from __future__ import (
+    absolute_import,
+    division,
+    print_function,
+    unicode_literals,
+)
 
 import os
 import time
@@ -12,8 +18,7 @@ import errno
 import stat
 
 import logbook
-
-logger = logbook.Logger(__name__)
+import six
 
 
 class LogWatcher(object):
@@ -40,9 +45,10 @@ class LogWatcher(object):
         self._files_map = {}
         self._callback = callback
         self._sizehint = sizehint
+        self._logger = logbook.Logger(__name__)
 
         self.update_files()
-        for _, file_ in self._files_map.iteritems():
+        for _, file_ in six.iteritems(self._files_map):
             file_.seek(os.path.getsize(file_.name))  # EOF
             if tail_lines:
                 try:
@@ -72,7 +78,7 @@ class LogWatcher(object):
         # than first checking file's last modification times.
         while True:
             self.update_files()
-            for _, file_ in self._files_map.iteritems():
+            for _, file_ in six.iteritems(self._files_map):
                 self.readlines(file_)
             if not blocking:
                 return
@@ -80,7 +86,7 @@ class LogWatcher(object):
 
     def log(self, line):
         """Log when a file is un/watched"""
-        logger.info(line)
+        self._logger.info(line)
 
     @classmethod
     def open(cls, file_):
@@ -158,7 +164,7 @@ class LogWatcher(object):
                     raise
 
         # check existent files
-        for fid, file_ in self._files_map.iteritems():
+        for fid, file_ in six.iteritems(self._files_map):
             try:
                 st = os.stat(file_.name)
                 if fid != self.get_file_id(st):
@@ -215,6 +221,6 @@ class LogWatcher(object):
         return "{:f}".format(st.st_ctime)
 
     def close(self):
-        for _, file_ in self._files_map.iteritems():
+        for _, file_ in six.iteritems(self._files_map):
             file_.close()
         self._files_map.clear()
