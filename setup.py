@@ -15,7 +15,7 @@ requirements = [
 
 setup(
     name="flosculus",
-    version="0.3.0-dev",
+    version="0.3.0",
     description="Tail your log, extract the data, and send it to Fluentd",
     long_description=long_desc,
     author="Isman Firmansyah",
