@@ -19,6 +19,7 @@ setup(
     description="Tail your log, extract the data, and send it to Fluentd",
     long_description=long_desc,
     author="Isman Firmansyah",
+    author_email="isman.firmansyah@gmail.com",
     url="https://github.com/iromli/flosculus",
     packages=find_packages(),
     license="MIT",
