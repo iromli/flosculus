@@ -88,3 +88,4 @@ Credits
 
 * `Beaver <https://github.com/josegonzalez/beaver>`_
 * `Fluentd <https://github.com/fluent/fluentd>`_
+* Giampaolo Rodola for the original code (MIT-licensed) that evolved into ``flosculus.watcher`` module
