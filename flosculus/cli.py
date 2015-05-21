@@ -19,13 +19,12 @@ import logbook
 from docopt import docopt
 
 from ._defaults import DEFAULT_CONFIG
-from ._meta import __version__
 from .core import Flosculus
 
 
 def main():
     logger = logbook.Logger(__name__)
-    arguments = docopt(__doc__, version=__version__)
+    arguments = docopt(__doc__)
 
     if arguments["--init"]:
         print(DEFAULT_CONFIG.strip())
