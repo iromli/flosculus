@@ -1,1 +1,1 @@
-from ._meta import __version__  # noqa
+__version__ = "0.4.dev0"  # noqa
